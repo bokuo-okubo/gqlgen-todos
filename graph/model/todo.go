@@ -18,6 +18,9 @@ func NewTodoFromEntity(e *entity.Todo) *Todo {
 		ID:   fmt.Sprintf("%d", e.ID),
 		Text: e.Text,
 		Done: e.Done,
-		// UserID: fmt.Sprintf("%d", e.UserID),
+		// User: &User{
+		// 	ID:   fmt.Sprintf("%d", e),
+		// 	Name: e.User.Name,
+		// },
 	}
 }

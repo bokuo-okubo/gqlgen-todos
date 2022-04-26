@@ -1,6 +1,9 @@
 package entity
 
+import "gorm.io/gorm"
+
 type User struct {
-	ID   uint
-	Name string
+	gorm.Model
+	Name  string
+	Todos []Todo
 }

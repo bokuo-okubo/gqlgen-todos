@@ -5,9 +5,7 @@ package graph
 
 import (
 	"context"
-	"crypto/rand"
-	"fmt"
-	"math/big"
+	"strconv"
 
 	"github.com/bokuo-okubo/gqlgen-todos/entity"
 	"github.com/bokuo-okubo/gqlgen-todos/graph/generated"
@@ -15,14 +13,20 @@ import (
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	randVal, _ := rand.Int(rand.Reader, big.NewInt(100))
-	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", randVal),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
+	uid, err := strconv.ParseUint(input.UserID, 10, 32)
+	if err != nil {
+		return nil, err
 	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
+	record := entity.Todo{
+		Text:   input.Text,
+		Done:   false,
+		UserID: uint(uid),
+	}
+	if err := r.DB.Create(&record).Error; err != nil {
+		return nil, err
+	}
+	res := model.NewTodoFromEntity(&record)
+	return res, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -39,7 +43,27 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+	var todos []entity.Todo
+	r.DB.Model(&todos).Association("User")
+
+	var rtnVal []*model.Todo
+	var user model.User
+	for _, t := range todos {
+
+		rtnVal = append(rtnVal, model.NewTodoFromEntity(&t))
+	}
+	return rtnVal, nil
+}
+
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	var users []entity.User
+	r.DB.Find(&users)
+
+	var rtnVal []*model.User
+	for _, u := range users {
+		rtnVal = append(rtnVal, model.NewUserFromEntity(&u))
+	}
+	return rtnVal, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
