@@ -8,3 +8,6 @@ init:
 
 gqlgen:
 	go run github.com/99designs/gqlgen@v0.17.4 generate
+
+run:
+	PORT=5000 go run server.go
