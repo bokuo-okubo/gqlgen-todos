@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/bokuo-okubo/gqlgen-todos/entity"
 	"github.com/bokuo-okubo/gqlgen-todos/graph/generated"
 	"github.com/bokuo-okubo/gqlgen-todos/graph/model"
 )
@@ -22,6 +23,19 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	}
 	r.todos = append(r.todos, todo)
 	return todo, nil
+}
+
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	record := entity.User{
+		Name: input.Name,
+	}
+	if err := r.DB.Create(&record).Error; err != nil {
+		return nil, err
+	}
+
+	res := model.NewUserFromEntity(&record)
+
+	return res, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {

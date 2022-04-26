@@ -1,6 +1,10 @@
 package graph
 
-import "github.com/bokuo-okubo/gqlgen-todos/graph/model"
+import (
+	"gorm.io/gorm"
+
+	"github.com/bokuo-okubo/gqlgen-todos/graph/model"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -8,4 +12,5 @@ import "github.com/bokuo-okubo/gqlgen-todos/graph/model"
 
 type Resolver struct {
 	todos []*model.Todo
+	DB    *gorm.DB
 }

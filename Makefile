@@ -10,4 +10,5 @@ gqlgen:
 	go run github.com/99designs/gqlgen@v0.17.4 generate
 
 run:
-	PORT=5000 go run server.go
+	go get -u github.com/cosmtrek/air
+	PORT=5000 air server.go
